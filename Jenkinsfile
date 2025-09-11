@@ -8,5 +8,12 @@ pipeline {
                 }
             }
         }
+        stage('Run Container') {
+            steps {
+                script {
+                    docker.image('flask-jenkins-demo').run('-d -p 5000:5000')
+                }
+            }
+        }
     }
 }
