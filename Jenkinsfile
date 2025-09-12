@@ -13,7 +13,9 @@ pipeline {
                 script {
                     def app = docker.image('flask-jenkins-demo').run('-d -p 5000:5000')
                     sleep 5
-                    sh 'curl --fail http://localhost:5000/'
+                    def containerId = app.id
+                    def containerIp = sh(script: "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${containerId}", returnStdout: true).trim()
+                    sh "curl --fail http://${containerIp}:5000/"
                     app.stop()
                 }
             }
