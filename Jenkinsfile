@@ -27,7 +27,7 @@ pipeline {
                     def app = docker.image("$ECR_REPO:latest").run('-d')
                     sleep 5
                     def containerId = app.id
-                    def containerIp = sh(script: \"docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${containerId}\", returnStdout: true).trim()
+                    def containerIp = sh(script: "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${containerId}", returnStdout: true).trim()
                     sh "curl --fail http://${containerIp}:5000/"
                     app.stop()
                 }
