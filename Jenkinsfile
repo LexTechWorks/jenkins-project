@@ -8,10 +8,13 @@ pipeline {
                 }
             }
         }
-        stage('Run Container') {
+        stage('Test Container') {
             steps {
                 script {
-                    docker.image('flask-jenkins-demo').run('-d -p 5000:5000')
+                    def app = docker.image('flask-jenkins-demo').run('-d -p 5000:5000')
+                    sleep 5
+                    sh 'curl --fail http://localhost:5000/'
+                    app.stop()
                 }
             }
         }
