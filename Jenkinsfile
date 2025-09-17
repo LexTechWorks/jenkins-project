@@ -9,6 +9,22 @@ pipeline {
   }
 
   stages {
+    stage('Terraform Init') {
+      steps {
+        sh 'cd infra && terraform init'
+      }
+    }
+    stage('Terraform Plan') {
+      steps {
+        sh 'cd infra && terraform plan -out=tfplan'
+      }
+    }
+    stage('Terraform Apply') {
+      steps {
+        sh 'cd infra && terraform apply -auto-approve tfplan'
+      }
+    }
+
     stage('Build Docker Image') {
       steps {
         sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
@@ -40,10 +56,8 @@ pipeline {
             aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
             aws configure set region $AWS_REGION
 
-            # login no REGISTRY (sem o /repo)
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
 
-            # tag e push
             docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_REPO:$IMAGE_TAG
             docker push $ECR_REPO:$IMAGE_TAG
           '''
@@ -79,7 +93,7 @@ pipeline {
 
             aws ecs update-service \
               --cluster project-z \
-              --service project-z-task-service-itif3wy9 \
+              --service flask-jenkins-demo-service \
               --force-new-deployment \
               --region $AWS_REGION
           '''
