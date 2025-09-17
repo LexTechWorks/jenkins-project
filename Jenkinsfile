@@ -13,6 +13,19 @@ pipeline {
         }
 
         stage('Push to ECR') {
+
+                    stage('Test Local Image') {
+                        steps {
+                            sh '''
+                                CONTAINER_ID=$(docker run -d $IMAGE_NAME:latest)
+                                sleep 5
+                                CONTAINER_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $CONTAINER_ID)
+                                curl --fail http://$CONTAINER_IP:5000/
+                                docker stop $CONTAINER_ID
+                                docker rm $CONTAINER_ID
+                            '''
+                        }
+                    }
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
