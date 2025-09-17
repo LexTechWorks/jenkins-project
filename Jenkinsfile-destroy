@@ -1,0 +1,10 @@
+pipeline {
+  agent any
+  stages {
+    stage('Terraform Destroy') {
+      steps {
+        sh 'cd infra && terraform destroy -auto-approve'
+      }
+    }
+  }
+}
