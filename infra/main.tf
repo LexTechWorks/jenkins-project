@@ -11,7 +11,8 @@ provider "aws" {
 }
 
 resource "aws_ecr_repository" "app" {
-  name = "flask-jenkins-demo"
+  name         = "flask-jenkins-demo"
+  force_delete = true
 }
 
 resource "aws_ecs_cluster" "main" {
